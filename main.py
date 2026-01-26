@@ -90,11 +90,11 @@ def _orp_index(word: str) -> int:
 def _pause_multiplier(core: str, suffix: str) -> float:
     punct_mult = 1.0
     if any(ch in PUNCT_STRONG for ch in suffix):
-        punct_mult = 2.2
+        punct_mult = 2.0
     elif any(ch in PUNCT_MED for ch in suffix):
         punct_mult = 1.8
     elif any(ch in PUNCT_LIGHT for ch in suffix):
-        punct_mult = 1.5
+        punct_mult = 1.4
 
     extra = max(0, len(core) - 8)
     long_mult = 1.0

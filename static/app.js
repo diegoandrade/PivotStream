@@ -32,8 +32,9 @@ let rampTimerId = null;
 let rampEnabled = true;
 let metaMode = "words";
 
-const RAMP_INTERVAL_MS = 20000;
+const RAMP_INTERVAL_MS = 10000;
 const RAMP_STEP = 20;
+const RAMP_MAX_WPM = 800;
 const WORDS_PER_PAGE = 300;
 
 function setStatus(message) {
@@ -156,7 +157,7 @@ function computeDelay(token) {
 }
 
 function clampWpm(value) {
-  return Math.min(1000, Math.max(100, value));
+  return Math.min(RAMP_MAX_WPM, Math.max(100, value));
 }
 
 function startRamp() {
