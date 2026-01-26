@@ -292,9 +292,11 @@ button.ghost {
   max-width: 900px;
   display: grid;
   grid-template-columns: 1fr 1ch 1fr;
-  align-items: baseline;
+  align-items: center;
   font-family: "Garamond", "Times New Roman", serif;
   font-size: clamp(2.6rem, 6vw, 4.4rem);
+  line-height: 1;
+  height: clamp(120px, 18vw, 170px);
   padding: 26px 24px;
   border-radius: 18px;
   border: 1px solid var(--border);
@@ -357,6 +359,7 @@ button.ghost {
   text-align: right;
   padding-right: 0.3ch;
   white-space: pre;
+  line-height: 1;
 }
 
 .pivot {
@@ -373,6 +376,7 @@ button.ghost {
   text-align: left;
   padding-left: 0.3ch;
   white-space: pre;
+  line-height: 1;
 }
 
 .meta {
