@@ -480,7 +480,7 @@ def _extract_epub_data(data: bytes) -> tuple[str, List[dict]]:
         return full_text, chapters
 
 
-def _extract_pdf_data(data: bytes) -> tuple[str, int]:
+def _extract_pdf_data(data: bytes) -> tuple[str, int, List[dict]]:
     try:
         reader = PdfReader(io.BytesIO(data))
     except Exception as exc:
@@ -501,7 +501,38 @@ def _extract_pdf_data(data: bytes) -> tuple[str, int]:
     full_text = _normalize_text("\n\n".join(chunks))
     if not full_text:
         raise ValueError("PDF had no readable text")
-    return full_text, len(reader.pages)
+    sections = _extract_pdf_sections(full_text)
+    return full_text, len(reader.pages), sections
+
+
+def _extract_pdf_sections(text: str) -> List[dict]:
+    pattern = re.compile(r"^(?P<num>\d{1,3})(?:\.(?P<sub>\d{1,3}))?(?:[.)])?\s+(?P<title>.+)$")
+    sections: List[dict] = []
+    seen: set[str] = set()
+    token_index = 0
+    for line in text.splitlines():
+        cleaned = _normalize_space(line)
+        if not cleaned:
+            continue
+        match = pattern.match(cleaned)
+        if match:
+            title = match.group("title").strip()
+            if re.search(r"[A-Za-z]", title):
+                num = match.group("num")
+                sub = match.group("sub")
+                label = f"{num}.{sub}" if sub else num
+                full_title = f"{label} {title}"
+                if full_title not in seen:
+                    sections.append(
+                        {
+                            "title": full_title,
+                            "start_index": token_index,
+                            "level": 0,
+                        }
+                    )
+                    seen.add(full_title)
+        token_index += _count_tokens(cleaned)
+    return sections
 
 
 def parse_text(text: str) -> List[Token]:
@@ -560,7 +591,7 @@ async def pdf_endpoint(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="File is empty")
 
     try:
-        text, pages = await asyncio.wait_for(
+        text, pages, sections = await asyncio.wait_for(
             asyncio.to_thread(_extract_pdf_data, data),
             timeout=IMPORT_TIMEOUT_SECONDS,
         )
@@ -571,7 +602,7 @@ async def pdf_endpoint(file: UploadFile = File(...)):
     except Exception as exc:
         raise HTTPException(status_code=500, detail="PDF import failed") from exc
 
-    return {"text": text, "pages": pages}
+    return {"text": text, "pages": pages, "chapters": sections}
 
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

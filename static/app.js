@@ -45,6 +45,7 @@ let metaMode = "words";
 let chapters = [];
 let activeChapterIndex = null;
 let inputDebounceId = null;
+let chapterMode = "none";
 
 const INPUT_DEBOUNCE_MS = 150;
 
@@ -94,12 +95,13 @@ function setChapterPanelMode(mode, message) {
   if (!chaptersPanel) {
     return;
   }
-  const showList = mode === "epub";
+  const showList = mode === "epub" || mode === "sections";
   if (chapterList) {
     chapterList.classList.toggle("is-hidden", !showList);
   }
   if (chapterLabel) {
-    chapterLabel.textContent = mode === "pdf" ? "Pages" : "Chapters";
+    chapterLabel.textContent =
+      mode === "pdf" ? "Pages" : mode === "sections" ? "Sections" : "Chapters";
   }
   chaptersPanel.classList.toggle("is-hidden", mode === "none");
   if (chapterDivider) {
@@ -138,6 +140,7 @@ function closeShortcuts() {
 function clearChapters() {
   chapters = [];
   activeChapterIndex = null;
+  chapterMode = "none";
   if (chapterList) {
     chapterList.innerHTML = "";
   }
@@ -161,10 +164,16 @@ function renderChapters() {
   }
   chapterList.innerHTML = "";
   if (!chapters.length) {
-    setChapterPanelMode("none", "No chapters loaded.");
+    const emptyLabel =
+      chapterMode === "sections" ? "No sections found." : "No chapters loaded.";
+    setChapterPanelMode(chapterMode === "sections" ? "sections" : "none", emptyLabel);
     return;
   }
-  setChapterPanelMode("epub", `${chapters.length} chapters`);
+  const label =
+    chapterMode === "sections"
+      ? `${chapters.length} sections`
+      : `${chapters.length} chapters`;
+  setChapterPanelMode(chapterMode === "sections" ? "sections" : "epub", label);
   chapters.forEach((chapter, index) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -466,6 +475,7 @@ loadEpub.addEventListener("click", async () => {
     }
     const data = await response.json();
     chapters = Array.isArray(data.chapters) ? data.chapters : [];
+    chapterMode = "epub";
     inputText.innerText = data.text || "";
     const parsed = await parseText();
     renderChapters();
@@ -504,7 +514,16 @@ if (loadPdf && pdfFile) {
     const data = await response.json();
     inputText.innerText = data.text || "";
     const parsed = await parseText();
-    if (parsed && Number.isFinite(data.pages)) {
+    const sections = Array.isArray(data.chapters) ? data.chapters : [];
+    if (sections.length) {
+      chapters = sections;
+      chapterMode = "sections";
+      renderChapters();
+      if (parsed) {
+        setActiveChapter(0);
+      }
+    } else if (Number.isFinite(data.pages)) {
+      chapterMode = "pdf";
       setChapterPanelMode("pdf", `PDF pages: ${data.pages}`);
     }
     setLoading(false);
