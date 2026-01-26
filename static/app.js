@@ -4,6 +4,8 @@ const inputText = document.getElementById("inputText");
 const loadSample = document.getElementById("loadSample");
 const epubFile = document.getElementById("epubFile");
 const loadEpub = document.getElementById("loadEpub");
+const pdfFile = document.getElementById("pdfFile");
+const loadPdf = document.getElementById("loadPdf");
 const parseStatus = document.getElementById("parseStatus");
 const chapterList = document.getElementById("chapterList");
 const chapterStatus = document.getElementById("chapterStatus");
@@ -391,6 +393,41 @@ loadEpub.addEventListener("click", async () => {
     setStatus(`Could not import EPUB: ${error.message}`);
   }
 });
+
+if (loadPdf && pdfFile) {
+  loadPdf.addEventListener("click", async () => {
+    const file = pdfFile.files[0];
+    if (!file) {
+      setStatus("Choose a PDF file first.");
+      return;
+    }
+    rampEnabled = true;
+    stopRamp();
+    setStatus("Importing PDF...");
+    clearChapters();
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch("/api/pdf", {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) {
+        const errorPayload = await response.json();
+        throw new Error(errorPayload.detail || "PDF import failed");
+      }
+      const data = await response.json();
+      inputText.innerText = data.text || "";
+      const parsed = await parseText();
+      if (parsed && Number.isFinite(data.pages)) {
+        setChapterStatus(`PDF pages: ${data.pages}`);
+      }
+    } catch (error) {
+      console.error(error);
+      setStatus(`Could not import PDF: ${error.message}`);
+    }
+  });
+}
 
 inputText.addEventListener("input", () => {
   stopPlayback();

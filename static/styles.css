@@ -29,20 +29,31 @@ body {
   gap: 24px;
 }
 
-.panel-grid {
+.layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.6fr);
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.55fr);
   gap: 24px;
   align-items: start;
 }
 
-.side-stack {
+.main-stack {
   display: grid;
   gap: 24px;
 }
 
+.side-panel {
+  display: grid;
+  gap: 18px;
+}
+
 .controls-panel .buttons {
   justify-content: flex-start;
+}
+
+.panel-divider {
+  height: 1px;
+  width: 100%;
+  background: var(--border);
 }
 
 .chapter-list {
@@ -225,7 +236,8 @@ button.ghost {
 }
 
 .focus-window {
-  width: min(900px, 96vw);
+  width: 100%;
+  max-width: 900px;
   display: grid;
   grid-template-columns: 1fr 1ch 1fr;
   align-items: baseline;
@@ -325,7 +337,7 @@ button.ghost {
 }
 
 @media (max-width: 600px) {
-  .panel-grid {
+  .layout {
     grid-template-columns: 1fr;
   }
 

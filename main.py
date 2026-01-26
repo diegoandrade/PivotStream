@@ -13,6 +13,7 @@ from xml.etree import ElementTree as ET
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
+from pypdf import PdfReader
 from pydantic import BaseModel
 
 app = FastAPI(title="PivotStream Studio")
@@ -471,6 +472,27 @@ def _extract_epub_data(data: bytes) -> tuple[str, List[dict]]:
         return full_text, chapters
 
 
+def _extract_pdf_data(data: bytes) -> tuple[str, int]:
+    try:
+        reader = PdfReader(io.BytesIO(data))
+    except Exception as exc:
+        raise ValueError("Invalid PDF file") from exc
+
+    if not reader.pages:
+        raise ValueError("PDF had no pages")
+
+    chunks: List[str] = []
+    for page in reader.pages:
+        text = page.extract_text() or ""
+        if text:
+            chunks.append(text)
+
+    full_text = _normalize_text("\n\n".join(chunks))
+    if not full_text:
+        raise ValueError("PDF had no readable text")
+    return full_text, len(reader.pages)
+
+
 def parse_text(text: str) -> List[Token]:
     # Split on whitespace then extract prefix/core/suffix from each chunk.
     tokens: List[Token] = []
@@ -506,6 +528,25 @@ async def epub_endpoint(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Invalid EPUB archive") from exc
 
     return {"text": text, "chapters": chapters}
+
+
+@app.post("/api/pdf")
+async def pdf_endpoint(file: UploadFile = File(...)):
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file uploaded")
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="File must be a .pdf")
+
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="File is empty")
+
+    try:
+        text, pages = _extract_pdf_data(data)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {"text": text, "pages": pages}
 
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
