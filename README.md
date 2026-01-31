@@ -4,7 +4,7 @@ A lightweight RSVP (rapid serial visual presentation) reader that keeps the Opti
 
 ## Features
 - RSVP display with fixed ORP alignment
-- Adjustable speed (100–1000 WPM)
+- Adjustable speed (100–1600 WPM)
 - Play / pause / resume / restart
 - Jump forward/back by 10 words
 - Text paste + EPUB/PDF import
@@ -38,6 +38,12 @@ Then open `http://127.0.0.1:8000`.
 pip install pre-commit
 pre-commit install
 pre-commit run --all-files
+```
+
+### Changelog
+Generate or update `CHANGELOG.md` locally:
+```bash
+git cliff -o CHANGELOG.md
 ```
 
 ## Notes
