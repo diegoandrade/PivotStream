@@ -1,0 +1,12 @@
+# Conventional Commit format
+# <type>(<scope>): <subject>
+# Example: fix(core): resolve timeout handling in monitor thread
+# Example (breaking): feat(cli)!: change default config file location
+#
+# Types: feat, fix, docs, chore, ci, test, refactor, perf, security
+# Scopes: cli, core, subprocess, docs, ci, deps
+#
+# Rules:
+# - Use the imperative mood in the subject (e.g., "add", "fix", "update").
+# - Lowercase the subject.
+# - Keep subject concise and descriptive.
