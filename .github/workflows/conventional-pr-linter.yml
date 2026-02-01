@@ -1,0 +1,52 @@
+name: Conventional PR Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR title
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            chore
+            ci
+            test
+            refactor
+            perf
+            security
+          scopes: |
+            cli
+            core
+            subprocess
+            docs
+            ci
+            deps
+          requireScope: false
+          allowBreakingChange: true
+          subjectPattern: ^(?![A-Z]).+
+          subjectPatternError: "Use an imperative, lower-case subject (e.g., 'add', 'fix', 'update')."
+          wip: false
+          headerPattern: '^(\w+)(?:\(([^)]+)\))?(!)?: (.+)$'
+          headerPatternCorrespondence: type, scope, breaking, subject
+          validateSingleCommit: false
+          ignoreLabels: |
+            skip-semantic-pr
+          errorMessage: |
+            PR title must follow conventional format: type(scope): description
+            Examples:
+              - fix(core): resolve timeout handling in monitor thread
+              - docs: update installation instructions
+              - chore(deps): bump ruff to v0.15.0
+              - feat(cli)!: change default config file location (BREAKING)

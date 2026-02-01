@@ -27,6 +27,33 @@ pre-commit install
 pre-commit run --all-files
 ```
 
+## Conventional Commits
+All commits and PR titles must follow the Conventional Commits format:
+```
+type(scope): description
+```
+
+Types: `feat`, `fix`, `docs`, `chore`, `ci`, `test`, `refactor`, `perf`, `security`
+Scopes: `cli`, `core`, `subprocess`, `docs`, `ci`, `deps`
+
+### Valid PR titles
+- `fix(core): resolve timeout handling in monitor thread`
+- `docs: update installation instructions`
+- `chore(deps): bump ruff to v0.15.0`
+- `feat(cli)!: change default config file location (BREAKING)`
+
+### Invalid PR titles
+- `Add new feature` (missing type)
+- `feat: adds support` (wrong verb tense; use imperative)
+- `FIX: bug` (wrong case)
+- `feature(core): new API` (wrong type)
+
+### Commit message template
+We provide a commit template at `.gitmessage`. Configure it locally:
+```bash
+git config commit.template .gitmessage
+```
+
 ## Release Process
 Releases are fully automated via GitHub Actions.
 
