@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
+## [0.1.2] - 2026-02-01
+
+### Changed
+- Ignore RELEASE.md ([405d2a9…](https://github.com/diegoandrade/PivotStream/commit/405d2a939d385a115991834325184859b6444ad2))
+
+
+### Documentation
+- Add security policy ([6d4867b…](https://github.com/diegoandrade/PivotStream/commit/6d4867ba65854d05ca2b328f74dbea3207f6c621))
 ## [0.1.1] - 2026-02-01
 
 ### Added
@@ -17,6 +25,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 ### Documentation
 - Expand commit message guidelines ([19805ea…](https://github.com/diegoandrade/PivotStream/commit/19805eaa7820dd60c5ea109b98899a80d54073de))
 - Add code of conduct and enforcement ([c3dfd33…](https://github.com/diegoandrade/PivotStream/commit/c3dfd33632888d266643f4e169b2b3a2cf441f2a))
+- Update changelog for v0.1.1 ([4903825…](https://github.com/diegoandrade/PivotStream/commit/490382505c534dd5b49b1c6f83ced2030e05f212))
 ## [0.1.0] - 2026-01-31
 
 ### Changed
